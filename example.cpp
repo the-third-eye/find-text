@@ -11,7 +11,7 @@ int main(){
 		exit(1);
 	}	
 	// use leptonica library to open input image
-	Pix *image = pixRead("phototest.tif");
+	Pix *image = pixRead("phototest.jpg");
 	api->SetImage(image);
 	// get result from ocr
 	outText = api->GetUTF8Text();
