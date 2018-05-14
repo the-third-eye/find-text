@@ -61,7 +61,14 @@ void prepare_image(Pix *image){
 		// convert image to binary
 		status = pixOtsuAdaptiveThreshold(image,
 				2000, 2000, 0, 0, 0.f, NULL, &image);
+<<<<<<< HEAD
 	}
+=======
+	// write the image to file
+	status = pixWriteImpliedFormat(file_name.c_str(),
+				       		image, 0, 0);
+	pixDestroy(&image);
+>>>>>>> 422be14e5ccb3065828ea8fa5314d8c7384cfeed
 }
 
 
