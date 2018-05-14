@@ -43,8 +43,8 @@ void prepare_image(const std::string& file_name){
 	int status = pixOtsuAdaptiveThreshold(image, 
 				2000, 2000, 0, 0, 0.f, NULL, &image);
 	// write the image to file
-	status = pixWriteImpliedFormat(file_name.c_str(), 
-										image, 0, 0);
+	status = pixWriteImpliedFormat(file_name.c_str(),
+				       		image, 0, 0);
 	pixDestroy(&image);
 }
 
