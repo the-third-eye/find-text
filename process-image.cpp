@@ -15,9 +15,9 @@ int main(){
 		exit(1);
 	}	
 
-	prepare_image("phototest5.jpg");
+	prepare_image("phototest7.jpg");
 	// use leptonica library to open input image
-	Pix *image = pixRead("phototest5.jpg");
+	Pix *image = pixRead("phototest7.jpg");
 	api->SetImage(image);
 	// get result from ocr
 	outText = api->GetUTF8Text();
