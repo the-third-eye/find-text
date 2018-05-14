@@ -3,25 +3,37 @@
 #include <iostream>
 #include <string>
 
-void prepare_image(const std::string& file_name);
+void prepare_image(Pix *image);
 
 int main(){
-
+		
 	char *outText;
+	std::string file_name;
+
 	tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 	// initialize tesseract-ocr with english
 	if(api->Init(NULL, "eng")){
-		fprintf(stderr, "Could not initialize tesseract.\n");
+		std::cerr << "Could not initialize tesseract.\n";
 		exit(1);
 	}	
 
-	prepare_image("phototest7.jpg");
+	std::cout << "enter file name:\n";
+	std::cin >> file_name;
+	
 	// use leptonica library to open input image
-	Pix *image = pixRead("phototest7.jpg");
+	Pix *image = pixRead(file_name.c_str());
+	if(!image){
+		std::cerr << file_name << " not found!\n";
+		exit(1);
+	}
+	// prep image for ocr
+	prepare_image(image);
 	api->SetImage(image);
+
 	// get result from ocr
 	outText = api->GetUTF8Text();
-	printf("OCR output:\n %s", outText);
+	std::cout << "OCR output:\n" << outText;
+	
 	// clean up
 	api->End();
 	delete[] outText;
@@ -30,21 +42,26 @@ int main(){
 	return 0;
 }
 
-void prepare_image(const std::string& file_name){
+/*	tesseract - improving quality
+ *	- desc: converts an image to binary
+ */
+void prepare_image(Pix *image){
+	if(!image) return;
 	
-	Pix *image = pixRead(file_name.c_str());
-	if(!image){
-		std::cerr << "error - file not found!\n";
-		return;
+	int status;
+	if(image->d == 32){
+		// convert image to grayscale
+		image = pixConvertRGBToGray(image, 0.f, 0.f, 0.f);
 	}
-	// grey scale convertion
-	image = pixConvertRGBToGray(image, 0.f, 0.f, 0.f);	
-	// perform otsu
-	int status = pixOtsuAdaptiveThreshold(image, 
+
+	if(image->d == 8){	
+		// sharpen image
+		image = pixUnsharpMaskingGray(image, 5, 2.5f);
+
+		// convert image to binary
+		status = pixOtsuAdaptiveThreshold(image,
 				2000, 2000, 0, 0, 0.f, NULL, &image);
-	// write the image to file
-	status = pixWriteImpliedFormat(file_name.c_str(), 
-										image, 0, 0);
-	pixDestroy(&image);
+	}
 }
+
 
