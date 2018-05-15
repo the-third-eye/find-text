@@ -28,8 +28,6 @@ int main(){
 	}
 	// prep image for ocr
 	prepare_image(&image);
-
-	std::cout << "depth(in bits): " << image->d << '\n';
 	api->SetImage(image);
 
 	// get result from ocr
