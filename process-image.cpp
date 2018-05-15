@@ -29,10 +29,7 @@ int main(){
 	}
 	// prep image for ocr
 	prepare_image(&image);
-<<<<<<< HEAD
-
-=======
->>>>>>> 1e1ec846c13678d5d92e37c6f8f437b098877785
+	
 	api->SetImage(image);
 	api->Recognize(NULL);
 	
@@ -72,9 +69,6 @@ void prepare_image(Pix **image){
 		// deskew image
 		*image = pixFindSkewAndDeskew(*image, 0, NULL, NULL);
 	}
-<<<<<<< HEAD
-
-
 }
 
 /* func: print_results
@@ -99,8 +93,6 @@ void print_results(tesseract::TessBaseAPI *api){
 			delete[] word;
 
 		}while(it->Next(level));
-	}	
-=======
->>>>>>> 1e1ec846c13678d5d92e37c6f8f437b098877785
+	}
 }
 
