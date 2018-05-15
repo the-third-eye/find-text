@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-void prepare_image(Pix *image);
+void prepare_image(Pix **image);
 
 int main(){
 		
@@ -27,7 +27,9 @@ int main(){
 		exit(1);
 	}
 	// prep image for ocr
-	prepare_image(image);
+	prepare_image(&image);
+
+	std::cout << "depth(in bits): " << image->d << '\n';
 	api->SetImage(image);
 
 	// get result from ocr
@@ -45,30 +47,22 @@ int main(){
 /*	tesseract - improving quality
  *	- desc: converts an image to binary
  */
-void prepare_image(Pix *image){
+void prepare_image(Pix **image){
 	if(!image) return;
 	
 	int status;
-	if(image->d == 32){
+	if((*image)->d == 32){
 		// convert image to grayscale
-		image = pixConvertRGBToGray(image, 0.f, 0.f, 0.f);
+		*image = pixConvertRGBToGray(*image, 0.f, 0.f, 0.f);
 	}
 
-	if(image->d == 8){	
-		// sharpen image
-		image = pixUnsharpMaskingGray(image, 5, 2.5f);
-
+	if((*image)->d == 8){	
+		
 		// convert image to binary
-		status = pixOtsuAdaptiveThreshold(image,
-				2000, 2000, 0, 0, 0.f, NULL, &image);
-<<<<<<< HEAD
+		status = pixOtsuAdaptiveThreshold(*image,
+				2000, 2000, 0, 0, 0.f, NULL, image);
+		// deskew image
+		*image = pixFindSkewAndDeskew(*image, 0, NULL, NULL);
 	}
-=======
-	// write the image to file
-	status = pixWriteImpliedFormat(file_name.c_str(),
-				       		image, 0, 0);
-	pixDestroy(&image);
->>>>>>> 422be14e5ccb3065828ea8fa5314d8c7384cfeed
 }
-
 
