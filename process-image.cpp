@@ -59,10 +59,17 @@ void prepare_image(Pix **image){
 	if((*image)->d == 8){	
 		
 		// convert image to binary
+<<<<<<< HEAD
 		status = pixOtsuAdaptiveThreshold(*image,
 				2000, 2000, 0, 0, 0.f, NULL, image);
 		// deskew image
 		*image = pixFindSkewAndDeskew(*image, 0, NULL, NULL);
 	}
+=======
+		status = pixOtsuAdaptiveThreshold(image,
+				2000, 2000, 0, 0, 0.f, NULL, &image);
+	}
+
+>>>>>>> e1a90353057ae1fa96968b06bd16fb0851f9ef40
 }
 
