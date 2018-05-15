@@ -29,7 +29,8 @@ int main(){
 	}
 	// prep image for ocr
 	prepare_image(&image);
-
+	// segmentation mode set to sparse text
+	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT_OSD);
 	api->SetImage(image);
 	api->Recognize(NULL);
 	
@@ -38,7 +39,9 @@ int main(){
 	print_results(api);
 
 	outText = api->GetUTF8Text();
-	std::cout << "\nOCR output:\n" << outText;
+	std::cout << "\nOCR output:\n" << outText;		
+	
+	pixWriteImpliedFormat("12322332.png", image, 0, 0);
 
 	// clean up
 	api->End();
@@ -54,18 +57,21 @@ int main(){
  *	- desc: converts an image to binary
  */
 void prepare_image(Pix **image){
-	if(!image) return;
 	
+	if(!image) return;
+
 	int status;
 	if((*image)->d == 32){
 		// convert image to grayscale
 		*image = pixConvertRGBToGray(*image, 0.f, 0.f, 0.f);
 	}
 
-	if((*image)->d == 8){		
+	if((*image)->d == 8 && (*image)->colormap == NULL){
+		// sharpen image
+		*image = pixUnsharpMaskingGray(*image, 5, 5.f);
 		// convert image to binary
 		status = pixOtsuAdaptiveThreshold(*image,
-				2000, 2000, 0, 0, 0.f, NULL, image);
+				4000, 4000, 0, 0, 0.f, NULL, image);
 		// deskew image
 		*image = pixFindSkewAndDeskew(*image, 0, NULL, NULL);
 	}
