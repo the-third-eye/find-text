@@ -4,6 +4,7 @@
 #include <string>
 
 void prepare_image(Pix **image);
+void print_results(tesseract::TessBaseAPI *api);
 
 int main(){
 		
@@ -29,22 +30,26 @@ int main(){
 	// prep image for ocr
 	prepare_image(&image);
 
-	std::cout << "depth(in bits): " << image->d << '\n';
 	api->SetImage(image);
-
-	// get result from ocr
-	outText = api->GetUTF8Text();
-	std::cout << "OCR output:\n" << outText;
+	api->Recognize(NULL);
 	
+	// print word statistics
+	std::cout << '\n';	
+	print_results(api);
+
+	outText = api->GetUTF8Text();
+	std::cout << "\nOCR output:\n" << outText;
+
 	// clean up
 	api->End();
-	delete[] outText;
 	pixDestroy(&image);
 	
 	return 0;
 }
 
 /*	tesseract - improving quality
+ *	func: prepare_image
+ *	- param: Pix pointer-to-pointer
  *	- desc: converts an image to binary
  */
 void prepare_image(Pix **image){
@@ -59,17 +64,37 @@ void prepare_image(Pix **image){
 	if((*image)->d == 8){	
 		
 		// convert image to binary
-<<<<<<< HEAD
 		status = pixOtsuAdaptiveThreshold(*image,
 				2000, 2000, 0, 0, 0.f, NULL, image);
 		// deskew image
 		*image = pixFindSkewAndDeskew(*image, 0, NULL, NULL);
 	}
-=======
-		status = pixOtsuAdaptiveThreshold(image,
-				2000, 2000, 0, 0, 0.f, NULL, &image);
-	}
 
->>>>>>> e1a90353057ae1fa96968b06bd16fb0851f9ef40
+
+}
+
+/* func: print_results
+ * - param: TessBaseAPI pointer
+ * - desc: print confidence statistics
+ * 	 for each word found by tesseract
+ */
+void print_results(tesseract::TessBaseAPI *api){
+	
+	if(!api) return;
+	
+	tesseract::ResultIterator *it = api->GetIterator();
+	tesseract::PageIteratorLevel level = tesseract::RIL_WORD;
+	std::string res;	
+		
+	if(it != NULL){
+		do{
+			const char *word = it->GetUTF8Text(level);
+			float confidence = it->Confidence(level);
+	
+			std::cout << word << ", confidence: " << confidence << '\n';
+			delete[] word;
+
+		}while(it->Next(level));
+	}	
 }
 
