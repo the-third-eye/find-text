@@ -29,7 +29,7 @@ int main(){
 	}
 	// prep image for ocr
 	prepare_image(&image);
-	
+
 	api->SetImage(image);
 	api->Recognize(NULL);
 	
@@ -42,6 +42,7 @@ int main(){
 
 	// clean up
 	api->End();
+	delete[] outText;
 	pixDestroy(&image);
 	
 	return 0;
@@ -61,14 +62,15 @@ void prepare_image(Pix **image){
 		*image = pixConvertRGBToGray(*image, 0.f, 0.f, 0.f);
 	}
 
-	if((*image)->d == 8){	
-		
+	if((*image)->d == 8){		
 		// convert image to binary
 		status = pixOtsuAdaptiveThreshold(*image,
 				2000, 2000, 0, 0, 0.f, NULL, image);
 		// deskew image
 		*image = pixFindSkewAndDeskew(*image, 0, NULL, NULL);
 	}
+
+
 }
 
 /* func: print_results
@@ -93,6 +95,6 @@ void print_results(tesseract::TessBaseAPI *api){
 			delete[] word;
 
 		}while(it->Next(level));
-	}
+	}	
 }
 
