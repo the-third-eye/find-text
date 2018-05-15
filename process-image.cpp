@@ -40,8 +40,6 @@ int main(){
 
 	outText = api->GetUTF8Text();
 	std::cout << "\nOCR output:\n" << outText;		
-	
-	pixWriteImpliedFormat("12322332.png", image, 0, 0);
 
 	// clean up
 	api->End();
