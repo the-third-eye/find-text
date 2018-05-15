@@ -40,12 +40,9 @@ int main(int argc, char *argv[]){
 
 	outText = api->GetUTF8Text();
 	std::cout << "\nOCR output:\n" << outText;		
-<<<<<<< HEAD:src/process-image.cpp
 	
 	// uncomment for output image from prepare	
 	//pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
-=======
->>>>>>> a1443d2b5094358fb7778b35f5b0cdd8c6f57f47:process-image.cpp
 
 	// clean up
 	api->End();
