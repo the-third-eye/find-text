@@ -6,11 +6,9 @@
 void prepare_image(Pix **image);
 void print_results(tesseract::TessBaseAPI *api);
 
-int main(){
-		
+int main(int argc, char *argv[]){
+	
 	char *outText;
-	std::string file_name;
-
 	tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 	// initialize tesseract-ocr with english
 	if(api->Init(NULL, "eng")){
@@ -18,9 +16,11 @@ int main(){
 		exit(1);
 	}	
 
+	std::string file_name;
 	std::cout << "enter file name:\n";
 	std::cin >> file_name;
 	
+	file_name = "photos/" + file_name;
 	// use leptonica library to open input image
 	Pix *image = pixRead(file_name.c_str());
 	if(!image){
@@ -41,7 +41,8 @@ int main(){
 	outText = api->GetUTF8Text();
 	std::cout << "\nOCR output:\n" << outText;		
 	
-	pixWriteImpliedFormat("12322332.png", image, 0, 0);
+	// uncomment for output image from prepare	
+	//pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
 
 	// clean up
 	api->End();
@@ -72,6 +73,8 @@ void prepare_image(Pix **image){
 		// convert image to binary
 		status = pixOtsuAdaptiveThreshold(*image,
 				4000, 4000, 0, 0, 0.f, NULL, image);
+		// fill gaps in image
+		*image = pixCloseBrick(NULL, *image, 3, 3);
 		// deskew image
 		*image = pixFindSkewAndDeskew(*image, 0, NULL, NULL);
 	}
