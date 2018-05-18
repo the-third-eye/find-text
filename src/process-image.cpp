@@ -1,53 +1,74 @@
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
-#include <iostream>
+#include <iostream> 
 #include <string>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
 
-void prepare_image(Pix **image);
-void print_results(tesseract::TessBaseAPI *api);
+static void prepare_image(Pix* &image);
+
+static void print_help(){
+	std::cout << "Usage: [options] <file>\n";
+	std::cout << "Options:\n";
+	std::cout << "--help\t Display this information\n";
+	std::cout << "--print\t Print word statistics\n";
+}
 
 int main(int argc, char *argv[]){
+
+	Pix *image = NULL;
+	FILE *fp = NULL;
+		
+	if(argc > 1){
+		// set program options	
+		for(int i = 1; i < argc; i++){
+			if(strcmp(argv[i], "--help") == 0){
+				print_help();
+				return 0;
+			}
+		}
+		// use first valid image file found
+		for(int i = 1; i < argc; i++){
+			fp = fopen(argv[i], "rb");
+			if(fp != NULL){
+				image = pixReadStream(fp, 0);
+				if(image != NULL)
+					break;
+			}
+		}
+		// no valid image file found
+		if(image == NULL){
+			std::cerr << "error: no valid file!\n";
+			return EXIT_FAILURE;
+		}
+
+	}	
+	else{
+		std::cerr << "error: no input file!\n";
+		return EXIT_FAILURE;
+	}
 	
 	char *outText;
 	tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 	// initialize tesseract-ocr with english
 	if(api->Init(NULL, "eng")){
 		std::cerr << "Could not initialize tesseract.\n";
-		exit(1);
+		return EXIT_FAILURE;
 	}	
-
-	std::string file_name;
-	std::cout << "enter file name:\n";
-	std::cin >> file_name;
 	
-	file_name = "photos/" + file_name;
-	// use leptonica library to open input image
-	Pix *image = pixRead(file_name.c_str());
-	if(!image){
-		std::cerr << file_name << " not found!\n";
-		exit(1);
-	}
 	// prep image for ocr
-	prepare_image(&image);
+	prepare_image(image);
 	// segmentation mode set to sparse text
-	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT_OSD);
-	api->SetImage(image);
-	api->Recognize(NULL);
-	
-	// print word statistics
-	std::cout << '\n';	
-	print_results(api);
-
+	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);
+	api->SetImage(image);	
 	outText = api->GetUTF8Text();
 	std::cout << "\nOCR output:\n" << outText;		
-<<<<<<< HEAD:src/process-image.cpp
 	
 	// uncomment for output image from prepare	
-	//pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
-=======
->>>>>>> a1443d2b5094358fb7778b35f5b0cdd8c6f57f47:process-image.cpp
-
+	pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
 	// clean up
+	fclose(fp);
 	api->End();
 	delete[] outText;
 	pixDestroy(&image);
@@ -58,55 +79,33 @@ int main(int argc, char *argv[]){
 /*	tesseract - improving quality
  *	func: prepare_image
  *	- param: Pix pointer-to-pointer
- *	- desc: converts an image to binary
+ *	- desc: prepares an image for the
+ *			tesseract ocr
  */
-void prepare_image(Pix **image){
+static void prepare_image(Pix* &image){
 	
 	if(!image) return;
-
-	int status;
-	if((*image)->d == 32){
+	Pix *gray = NULL, *close = NULL;
+	if(image->d == 32){
 		// convert image to grayscale
-		*image = pixConvertRGBToGray(*image, 0.f, 0.f, 0.f);
+		image = pixConvertRGBToGray(image, 0.f, 0.f, 0.f);
 	}
 
-	if((*image)->d == 8 && (*image)->colormap == NULL){
-		// sharpen image
-		*image = pixUnsharpMaskingGray(*image, 5, 5.f);
+	if(image->d == 8 && image->colormap == NULL){
+		// apply median filter
+		gray = pixRankFilterGray(image, 2, 2, 0.5);
+		if(gray != image){
+			std::cerr << "gray not image\n";
+		}
 		// convert image to binary
-		status = pixOtsuAdaptiveThreshold(*image,
-				4000, 4000, 0, 0, 0.f, NULL, image);
-		// fill gaps in image
-		*image = pixCloseBrick(NULL, *image, 3, 3);
+		pixOtsuAdaptiveThreshold(gray, 4000, 4000, 
+				0, 0, 0.f, NULL, &gray);
+		// optionally close or open based on histogram
+		 close = pixCloseBrick(NULL, gray, 2, 2);
 		// deskew image
-		*image = pixFindSkewAndDeskew(*image, 0, NULL, NULL);
+		image = pixFindSkewAndDeskew(close, 0, NULL, NULL);
 	}
-
-
-}
-
-/* func: print_results
- * - param: TessBaseAPI pointer
- * - desc: print confidence statistics
- * 	 for each word found by tesseract
- */
-void print_results(tesseract::TessBaseAPI *api){
-	
-	if(!api) return;
-	
-	tesseract::ResultIterator *it = api->GetIterator();
-	tesseract::PageIteratorLevel level = tesseract::RIL_WORD;
-	std::string res;	
-		
-	if(it != NULL){
-		do{
-			const char *word = it->GetUTF8Text(level);
-			float confidence = it->Confidence(level);
-	
-			std::cout << word << ", confidence: " << confidence << '\n';
-			delete[] word;
-
-		}while(it->Next(level));
-	}	
+//	pixDestroy(&gray);
+//	pixDestroy(&close);
 }
 

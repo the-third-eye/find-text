@@ -1,0 +1,5 @@
+# no object or archive files
+*.[oa]
+# no swap files
+*.swp
+*~
