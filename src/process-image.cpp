@@ -66,7 +66,12 @@ int main(int argc, char *argv[]){
 	std::cout << "\nOCR output:\n" << outText;		
 	
 	// uncomment for output image from prepare	
+<<<<<<< HEAD
 	pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
+=======
+	//pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
+
+>>>>>>> 17ccae0b50e7b9dbc240f3c1830abf2f08911004
 	// clean up
 	fclose(fp);
 	api->End();
