@@ -66,12 +66,7 @@ int main(int argc, char *argv[]){
 	std::cout << "\nOCR output:\n" << outText;		
 	
 	// uncomment for output image from prepare	
-<<<<<<< HEAD
 	pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
-=======
-	//pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
-
->>>>>>> 17ccae0b50e7b9dbc240f3c1830abf2f08911004
 	// clean up
 	fclose(fp);
 	api->End();
@@ -88,9 +83,7 @@ int main(int argc, char *argv[]){
  *			tesseract ocr
  */
 static void prepare_image(Pix* &image){
-	
-	if(!image) return;
-	Pix *gray = NULL, *close = NULL;
+		
 	if(image->d == 32){
 		// convert image to grayscale
 		image = pixConvertRGBToGray(image, 0.f, 0.f, 0.f);
@@ -98,19 +91,14 @@ static void prepare_image(Pix* &image){
 
 	if(image->d == 8 && image->colormap == NULL){
 		// apply median filter
-		gray = pixRankFilterGray(image, 2, 2, 0.5);
-		if(gray != image){
-			std::cerr << "gray not image\n";
-		}
+		image = pixRankFilterGray(image, 2, 2, 0.5);
 		// convert image to binary
-		pixOtsuAdaptiveThreshold(gray, 4000, 4000, 
-				0, 0, 0.f, NULL, &gray);
+		pixOtsuAdaptiveThreshold(image, 4000, 4000, 
+				0, 0, 0.f, NULL, &image);
 		// optionally close or open based on histogram
-		 close = pixCloseBrick(NULL, gray, 2, 2);
+		image = pixCloseBrick(NULL, image, 2, 2);
 		// deskew image
-		image = pixFindSkewAndDeskew(close, 0, NULL, NULL);
+		image = pixFindSkewAndDeskew(image, 0, NULL, NULL);
 	}
-//	pixDestroy(&gray);
-//	pixDestroy(&close);
 }
 
