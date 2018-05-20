@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
-#include <list>
 #include <unordered_set>
 
 #define ALPHANUM "abcdefghijklmnopqrstuvwxyz\
@@ -80,8 +79,21 @@ int main(int argc, char *argv[]){
 	
 	std::cout << "words found:\n";	
 	for(const std::string &word: words){
-		if(api->IsValidWord(word.c_str()))
-			std::cout << word << '\n';
+		if(word.size() > 1){
+			if(api->IsValidWord(word.c_str()))
+				std::cout << word << '\n';
+			else{ // only numeric
+				bool numeric = true;
+				for(char c: word){
+					if(!isdigit(c)){
+						numeric = false;
+						break;
+					}
+				}
+				if(numeric)
+					std::cout << word << '\n';
+			}	
+		}
 	}
 	
 	fclose(fp);
