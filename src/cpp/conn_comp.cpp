@@ -67,7 +67,7 @@ int main( int argc, const char** argv )
             pixel = colors[label];
          }
      }
-	
+
 	Mat comp(img.size(), CV_8UC3);
 	for(int lab = 0; lab < nLabels; ++lab){
 		int comp_pixels = 0;
@@ -79,8 +79,9 @@ int main( int argc, const char** argv )
 					pixel = colors[label];
 					comp_pixels++;
 				}
-				else
+				else{
 					pixel = colors[0];
+				}
 			}
 		}
 		if(comp_pixels >= pixel_thresh){
