@@ -13,6 +13,16 @@
 
 static void prepare_image(Pix* &image);
 
+inline bool is_num(const std::string &str){
+	for(int i = 0; i < str.size(); ++i){
+		if(!isdigit(str[i]))
+			return false;
+	}
+
+	return true;
+}
+
+
 static void print_help(){
 	std::cout << "Usage: [options] <file>\n";
 	std::cout << "Options:\n";
@@ -83,14 +93,7 @@ int main(int argc, char *argv[]){
 			if(api->IsValidWord(word.c_str()))
 				std::cout << word << '\n';
 			else{ // only numeric
-				bool numeric = true;
-				for(char c: word){
-					if(!isdigit(c)){
-						numeric = false;
-						break;
-					}
-				}
-				if(numeric)
+				if(is_num(word))
 					std::cout << word << '\n';
 			}	
 		}
