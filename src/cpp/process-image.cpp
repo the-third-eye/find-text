@@ -8,11 +8,11 @@
 
 static void prepare_image(Pix* &image);
 
+
 static void print_help(){
 	std::cout << "Usage: [options] <file>\n";
 	std::cout << "Options:\n";
 	std::cout << "--help\t Display this information\n";
-	std::cout << "--print\t Print word statistics\n";
 }
 
 int main(int argc, char *argv[]){
@@ -20,15 +20,14 @@ int main(int argc, char *argv[]){
 	Pix *image = NULL;
 	FILE *fp = NULL;
 		
-	if(argc > 1){
-		// set program options	
+	if(argc > 1){	
 		for(int i = 1; i < argc; i++){
 			if(strcmp(argv[i], "--help") == 0){
 				print_help();
 				return 0;
 			}
 		}
-		// use first valid image file found
+
 		for(int i = 1; i < argc; i++){
 			fp = fopen(argv[i], "rb");
 			if(fp != NULL){
@@ -37,12 +36,11 @@ int main(int argc, char *argv[]){
 					break;
 			}
 		}
-		// no valid image file found
+
 		if(image == NULL){
 			std::cerr << "error: no valid file!\n";
 			return EXIT_FAILURE;
 		}
-
 	}	
 	else{
 		std::cerr << "error: no input file!\n";
@@ -96,9 +94,10 @@ static void prepare_image(Pix* &image){
 		pixOtsuAdaptiveThreshold(image, 4000, 4000, 
 				0, 0, 0.f, NULL, &image);
 		// optionally close or open based on histogram
-		image = pixCloseBrick(NULL, image, 2, 2);
+		image = pixCloseBrick(NULL, image, 4, 4);
 		// deskew image
 		image = pixFindSkewAndDeskew(image, 0, NULL, NULL);
 	}
+	
 }
 
