@@ -2,6 +2,7 @@
 #include <leptonica/allheaders.h>
 #include <iostream> 
 #include <string>
+#include <sstream>
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
@@ -60,7 +61,8 @@ int main(int argc, char *argv[]){
 	api->SetImage(image);
 	Boxa *boxes = api->GetComponentImages(tesseract::RIL_WORD, true, NULL, NULL);
 	std::cout << "components: " << boxes->n << "\n";
-	
+	std::cout << "processing components...\n";
+
 	std::list<std::string> words;
 	for(int i = 0; i < boxes->n; ++i){
 		BOX *box = boxaGetBox(boxes, i, L_CLONE);
@@ -74,7 +76,13 @@ int main(int argc, char *argv[]){
 	std::cout << "text found:\n";	
 	std::list<std::string>::const_iterator it;
 	for(it = words.begin(); it != words.end(); it++){
-		std::cout << *it << '\n';
+		std::stringstream ss(*it);
+		std::string word;
+		// split string into white space delimited words
+		while(ss >> word){
+			if(word.size() > 1 && api->IsValidWord(word.c_str()))
+				std::cout << word << '\n';
+		}
 	}
 	
 	fclose(fp);

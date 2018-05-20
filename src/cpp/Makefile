@@ -1,4 +1,4 @@
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -std=c++11
 
 COMP_OBJS = conn_comp.o
 COMP_LIBS = -lopencv_core -lopencv_imgproc \
