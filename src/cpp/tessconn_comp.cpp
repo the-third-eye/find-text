@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <list>
 
 static void prepare_image(Pix* &image);
 
@@ -46,58 +47,39 @@ int main(int argc, char *argv[]){
 		return EXIT_FAILURE;
 	}
 	
-	char *outText;
 	tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 	// initialize tesseract-ocr with english
 	if(api->Init(NULL, "eng")){
 		std::cerr << "Could not initialize tesseract.\n";
 		return EXIT_FAILURE;
-	}	
+	}
+	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);	
+	api->SetImage(image);
+	Boxa *boxes = api->GetComponentImages(tesseract::RIL_WORD, true, NULL, NULL);
+	std::cout << "components: " << boxes->n << "\n";
 	
-	// prep image for ocr
-	prepare_image(image);
-	// segmentation mode set to sparse text
-	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);
-	api->SetImage(image);	
-	outText = api->GetUTF8Text();
-	std::cout << "\nOCR output:\n" << outText;		
+	std::list<std::string> words;
+	for(int i = 0; i < boxes->n; ++i){
+		BOX *box = boxaGetBox(boxes, i, L_CLONE);
+		api->SetRectangle(box->x, box->y, box->w, box->h);
+		char *ocrResult = api->GetUTF8Text();
+		int conf = api->MeanTextConf();		
+		words.push_back(ocrResult);	
+		boxDestroy(&box);
+		delete[] ocrResult;
+	}		
 	
-	// uncomment for output image from prepare	
-	pixWriteImpliedFormat("output-prepare.png", image, 0, 0);
-	// clean up
+	std::cout << "text found:\n";	
+	std::list<std::string>::const_iterator it;
+	for(it = words.begin(); it != words.end(); it++){
+		std::cout << *it << '\n';
+	}
+
 	fclose(fp);
 	api->End();
-	delete[] outText;
 	pixDestroy(&image);
+	boxaDestroy(&boxes);
 	
 	return 0;
-}
-
-
-/*	tesseract - improving quality
- *	func: prepare_image
- *	- param: Pix pointer-to-pointer
- *	- desc: prepares an image for the
- *			tesseract ocr
- */
-static void prepare_image(Pix* &image){
-		
-	if(image->d == 32){
-		// convert image to grayscale
-		image = pixConvertRGBToGray(image, 0.f, 0.f, 0.f);
-	}
-
-	if(image->d == 8 && image->colormap == NULL){
-		// apply median filter
-		image = pixRankFilterGray(image, 2, 2, 0.5);
-		// convert image to binary
-		pixOtsuAdaptiveThreshold(image, 4000, 4000, 
-				0, 0, 0.f, NULL, &image);
-		// optionally close or open based on histogram
-		image = pixCloseBrick(NULL, image, 4, 4);
-		// deskew image
-	//	image = pixFindSkewAndDeskew(image, 0, NULL, NULL);
-	}
-	
 }
 
