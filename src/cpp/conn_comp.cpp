@@ -67,11 +67,10 @@ int main( int argc, const char** argv )
             pixel = colors[label];
          }
      }
-<<<<<<< HEAD
-
-	Mat comp(img.size(), CV_8UC3);
-	for(int lab = 0; lab < nLabels; ++lab){
-		int comp_pixels = 0;
+	
+     Mat comp(img.size(), CV_8UC3);
+     for(int lab = 0; lab < nLabels; ++lab){
+     	int comp_pixels = 0;
 		for(int r = 0; r < dst.rows; ++r){
 			for(int c = 0; c < dst.cols; ++c){
 				int label = labelImage.at<int>(r, c);
@@ -83,29 +82,12 @@ int main( int argc, const char** argv )
 				else{
 					pixel = colors[0];
 				}
-=======
-	
-     Mat comp(img.size(), CV_8UC3);
-     for(int lab = 0; lab < nLabels; ++lab){
-     	int comp_pixels = 0;
-	for(int r = 0; r < dst.rows; ++r){
-		for(int c = 0; c < dst.cols; ++c){
-			int label = labelImage.at<int>(r, c);
-			Vec3b &pixel = comp.at<Vec3b>(r, c);
-			if(label == lab){
-				pixel = colors[label];
-				comp_pixels++;
-			}
-			else{
-				pixel = colors[0];
->>>>>>> 0198a4606e05681ad43d28d3fa7514f1eadf0610
 			}
 		}
-	}
-	if(comp_pixels >= pixel_thresh){
-		imshow("Connected Components", comp);
-		waitKey(0);
-	}
+		if(comp_pixels >= pixel_thresh){
+			imshow("Connected Components", comp);
+			waitKey(0);
+		}
     }
 
     imshow( "Connected Components", dst );
