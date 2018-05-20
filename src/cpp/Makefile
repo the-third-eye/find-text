@@ -1,4 +1,4 @@
-CFLAGS = -Wall -g -std=c++11
+CFLAGS = -std=c++11
 
 COMP_OBJS = conn_comp.o
 COMP_LIBS = -lopencv_core -lopencv_imgproc \
@@ -14,13 +14,22 @@ TESS_LIBS = -llept -ltesseract
 all: conn_comp img_proc tessconn_comp
 
 conn_comp: $(COMP_OBJS)
-	g++ $(CFLAGS) -o conn_comp $(COMP_OBJS) $(COMP_LIBS)
+	g++ -o conn_comp $(COMP_OBJS) $(COMP_LIBS)
+
+conn_comp.o: conn_comp.cpp
+	g++ -c $(CFLAGS) conn_comp.cpp
 
 img_proc: $(PROC_OBJS)
-	g++ $(CFLAGS) -o img_proc $(PROC_OBJS) $(PROC_LIBS)
+	g++ -o img_proc $(PROC_OBJS) $(PROC_LIBS)
+
+img_proc.o: img_proc.cpp
+	g++ -c $(CFLAGS) img_proc.cpp
 
 tessconn_comp: $(TESS_OBJS)
-	g++ $(CFLAGS) -o tessconn_comp $(TESS_OBJS) $(TESS_LIBS)
+	g++ -o tessconn_comp $(TESS_OBJS) $(TESS_LIBS)
+
+tessconn_comp.o: tessconn_comp.cpp
+	g++ -c $(CFLAGS) tessconn_comp.cpp
 
 .PHONY: cleanall cleanconn_comp cleanimg_proc cleantessconn_comp
 cleanall: 

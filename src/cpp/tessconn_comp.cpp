@@ -7,6 +7,7 @@
 #include <cstring>
 #include <cstdio>
 #include <list>
+#include <unordered_set>
 
 #define ALPHANUM "abcdefghijklmnopqrstuvwxyz\
 	ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -63,26 +64,24 @@ int main(int argc, char *argv[]){
 	std::cout << "components: " << boxes->n << "\n";
 	std::cout << "processing components...\n";
 
-	std::list<std::string> words;
+	std::unordered_set<std::string> words;
 	for(int i = 0; i < boxes->n; ++i){
 		BOX *box = boxaGetBox(boxes, i, L_CLONE);
 		api->SetRectangle(box->x, box->y, box->w, box->h);
-		char *ocrResult = api->GetUTF8Text();		
-		words.push_back(ocrResult);	
+		std::string ocrResult(api->GetUTF8Text());	
+		// split ocr result into white space delimited words	
+		std::stringstream ss(ocrResult);
+		std::string word;
+		while(ss >> word)
+			words.insert(word);
+
 		boxDestroy(&box);
-		delete[] ocrResult;
 	}		
 	
-	std::cout << "text found:\n";	
-	std::list<std::string>::const_iterator it;
-	for(it = words.begin(); it != words.end(); it++){
-		std::stringstream ss(*it);
-		std::string word;
-		// split string into white space delimited words
-		while(ss >> word){
-			if(word.size() > 1 && api->IsValidWord(word.c_str()))
-				std::cout << word << '\n';
-		}
+	std::cout << "words found:\n";	
+	for(const std::string &word: words){
+		if(api->IsValidWord(word.c_str()))
+			std::cout << word << '\n';
 	}
 	
 	fclose(fp);
