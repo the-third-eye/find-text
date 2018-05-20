@@ -86,18 +86,27 @@ int main(int argc, char *argv[]){
 
 		boxDestroy(&box);
 	}		
-	
+
 	std::cout << "words found:\n";	
 	for(const std::string &word: words){
+		// print only words in the dictionary
+		// or numbers
 		if(word.size() > 1){
 			if(api->IsValidWord(word.c_str()) || is_num(word))
 				std::cout << word << '\n';
 		}
 	}
 	
+	// draw word bounding boxes on image	
+	Pix *image_bb = pixDrawBoxa(image, boxes, 5, 0xff0000);
+	// write image to output file	
+	pixWriteImpliedFormat("output.png", image_bb, 0, 0);
+	
+	// clean up
 	fclose(fp);
 	api->End();
 	pixDestroy(&image);
+	pixDestroy(&image_bb);
 	boxaDestroy(&boxes);
 	
 	return 0;
