@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
 		if(word.size() > 1){
 			if(api->IsValidWord(word.c_str()))
 				std::cout << word << '\n';
-			else if(is_num(word))
+			else if(is_num(word)){
 				std::cout << word << '\n';
 			}	
 		}
