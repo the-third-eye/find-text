@@ -7,6 +7,9 @@
 #include <cstdio>
 #include <list>
 
+#define ALPHANUM "abcdefghijklmnopqrstuvwxyz\
+	ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
 static void prepare_image(Pix* &image);
 
 static void print_help(){
@@ -53,7 +56,7 @@ int main(int argc, char *argv[]){
 		std::cerr << "Could not initialize tesseract.\n";
 		return EXIT_FAILURE;
 	}
-	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);	
+	api->SetVariable("tessedit_char_whitelist", ALPHANUM);
 	api->SetImage(image);
 	Boxa *boxes = api->GetComponentImages(tesseract::RIL_WORD, true, NULL, NULL);
 	std::cout << "components: " << boxes->n << "\n";
@@ -62,8 +65,7 @@ int main(int argc, char *argv[]){
 	for(int i = 0; i < boxes->n; ++i){
 		BOX *box = boxaGetBox(boxes, i, L_CLONE);
 		api->SetRectangle(box->x, box->y, box->w, box->h);
-		char *ocrResult = api->GetUTF8Text();
-		int conf = api->MeanTextConf();		
+		char *ocrResult = api->GetUTF8Text();		
 		words.push_back(ocrResult);	
 		boxDestroy(&box);
 		delete[] ocrResult;
@@ -74,7 +76,7 @@ int main(int argc, char *argv[]){
 	for(it = words.begin(); it != words.end(); it++){
 		std::cout << *it << '\n';
 	}
-
+	
 	fclose(fp);
 	api->End();
 	pixDestroy(&image);
