@@ -90,11 +90,8 @@ int main(int argc, char *argv[]){
 	std::cout << "words found:\n";	
 	for(const std::string &word: words){
 		if(word.size() > 1){
-			if(api->IsValidWord(word.c_str()))
+			if(api->IsValidWord(word.c_str()) || is_num(word))
 				std::cout << word << '\n';
-			else if(is_num(word)){
-				std::cout << word << '\n';
-			}	
 		}
 	}
 	
