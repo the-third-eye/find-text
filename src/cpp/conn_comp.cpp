@@ -15,7 +15,7 @@ static void help()
              "  ./connected_components <image(../data/stuff.jpg as default)>\n"
              "The image is converted to grayscale and displayed.\n"
              "Press any key to cycle through the connected components.\n"
-			 "All the connected components are displayed as the final image\n";
+	     "All the connected components are displayed as the final image\n";
 }
 
 const char* keys =
@@ -44,18 +44,18 @@ int main( int argc, const char** argv )
     imshow( "Image", img );
     namedWindow( "Connected Components", 1 );
  
-	const int threshval = 100;
-	// change to display smaller
-	// or larger components
-	const int pixel_thresh = 40;
+    const int threshval = 100;
+    // change to display smaller
+    // or larger components
+    const int pixel_thresh = 40;
 
-	Mat bw = threshval < 128 ? (img < threshval) : (img > threshval);
+    Mat bw = threshval < 128 ? (img < threshval) : (img > threshval);
     Mat labelImage(img.size(), CV_32S);
     int nLabels = connectedComponents(bw, labelImage, 8);
     std::vector<Vec3b> colors(nLabels);
     colors[0] = Vec3b(0, 0, 0);// background
     
-	for(int label = 1; label < nLabels; ++label){
+    for(int label = 1; label < nLabels; ++label){
         colors[label] = Vec3b( (rand()&255), (rand()&255), (rand()&255) );
     }
 
@@ -68,26 +68,27 @@ int main( int argc, const char** argv )
          }
      }
 	
-	Mat comp(img.size(), CV_8UC3);
-	for(int lab = 0; lab < nLabels; ++lab){
-		int comp_pixels = 0;
-		for(int r = 0; r < dst.rows; ++r){
-			for(int c = 0; c < dst.cols; ++c){
-				int label = labelImage.at<int>(r, c);
-				Vec3b &pixel = comp.at<Vec3b>(r, c);
-				if(label == lab){
-					pixel = colors[label];
-					comp_pixels++;
-				}
-				else
-					pixel = colors[0];
+     Mat comp(img.size(), CV_8UC3);
+     for(int lab = 0; lab < nLabels; ++lab){
+     	int comp_pixels = 0;
+	for(int r = 0; r < dst.rows; ++r){
+		for(int c = 0; c < dst.cols; ++c){
+			int label = labelImage.at<int>(r, c);
+			Vec3b &pixel = comp.at<Vec3b>(r, c);
+			if(label == lab){
+				pixel = colors[label];
+				comp_pixels++;
+			}
+			else{
+				pixel = colors[0];
 			}
 		}
-		if(comp_pixels >= pixel_thresh){
-			imshow("Connected Components", comp);
-			waitKey(0);
-		}
 	}
+	if(comp_pixels >= pixel_thresh){
+		imshow("Connected Components", comp);
+		waitKey(0);
+	}
+    }
 
     imshow( "Connected Components", dst );
     waitKey(0);
