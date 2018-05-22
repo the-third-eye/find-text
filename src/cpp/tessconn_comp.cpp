@@ -86,7 +86,7 @@ int main(int argc, char *argv[]){
 
 		boxDestroy(&box);
 	}		
-
+		
 	std::cout << "words found:\n";	
 	for(const std::string &word: words){
 		// print only words in the dictionary

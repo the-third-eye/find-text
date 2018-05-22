@@ -20,7 +20,7 @@ static void help()
 
 const char* keys =
 {
-    "{help h||}{@image|../data/stuff.jpg|image for converting to a grayscale}"
+    "{help h||}{@image|../photos/stuff.jpg|image for converting to a grayscale}"
 };
 
 int main( int argc, const char** argv )
