@@ -38,15 +38,15 @@ int main(int argc, char *argv[]){
 
 	std::vector<cv::Rect> rects;
 	cv::Mat dst(src.size(), CV_8UC3, cv::Scalar(WHITE, WHITE, WHITE));	
-	cv::Vec3b color1(BLACK, BLACK, BLACK);
+	cv::Vec3b color(BLACK, BLACK, BLACK);
 	// draw contours and bounding boxes on src image
 	for(auto contour: contours){
 		for(const cv::Point& pt: contour){
 			cv::Vec3b& pixel = src.at<cv::Vec3b>(pt.y, pt.x);
-			pixel = color1;
+			pixel = color;
 		}
 		rects.push_back(cv::boundingRect(contour));
-		cv::rectangle(src, rects.back(), color1);
+		cv::rectangle(src, rects.back(), color);
 	}
 	// draw pixels from bounding boxes on dst image
 	for(const cv::Rect& rect: rects){
